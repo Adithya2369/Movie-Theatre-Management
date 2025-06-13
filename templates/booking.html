@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select Seats</title>
+    <style>
+        .seat-map {
+            display: grid;
+            grid-template-columns: repeat(10, 40px);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .seat {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .seat.selected {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+        .seat.booked {
+            background: #dc3545;
+            cursor: not-allowed;
+        }
+        #confirmBtn {
+            padding: 12px 30px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Select Seats</h2>
+    
+    <form id="bookingForm" method="POST">
+        <div class="seat-map">
+            {% for seat in seats %}
+            <div class="seat" 
+                 data-seat-id="{{ seat[0] }}"
+                 data-row="{{ seat[1] }}"
+                 data-number="{{ seat[2] }}">
+                {{ seat[1] }}{{ seat[2] }}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <button type="button" id="confirmBtn">Confirm Selection</button>
+    </form>
+
+    <script>
+        const seats = document.querySelectorAll('.seat');
+        const selectedSeats = new Set();
+        
+        seats.forEach(seat => {
+            seat.addEventListener('click', () => {
+                const seatId = seat.dataset.seatId;
+                
+                if(seat.classList.contains('booked')) return;
+                
+                if(selectedSeats.has(seatId)) {
+                    seat.classList.remove('selected');
+                    selectedSeats.delete(seatId);
+                } else {
+                    seat.classList.add('selected');
+                    selectedSeats.add(seatId);
+                }
+            });
+        });
+
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            const form = document.getElementById('bookingForm');
+            
+            // Remove previous hidden inputs
+            document.querySelectorAll('input[type="hidden"]').forEach(input => input.remove());
+            
+            // Add new hidden inputs for selected seats
+            selectedSeats.forEach(seatId => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'seats';
+                input.value = seatId;
+                form.appendChild(input);
+            });
+            
+            if(selectedSeats.size === 0) {
+                alert('Please select at least one seat!');
+                return;
+            }
+            
+            form.submit();
+        });
+    </script>
+</body>
+</html>

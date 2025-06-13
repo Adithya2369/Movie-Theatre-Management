@@ -1,0 +1,23 @@
+{% extends "staff/base.html" %}
+{% block content %}
+    <h1>Staff Dashboard</h1>
+    
+    <div class="movie-grid">
+        {% for movie in movies %}
+        <div class="card">
+            <h3>{{ movie[1] }}</h3>
+            <p>Screens: {{ movie[4]|join(', ') or 'No screenings' }}</p>
+            <p>Total Bookings: {{ movie[3] }}</p>
+            <a href="{{ url_for('staff_movie_detail', movie_id=movie[0]) }}">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <style>
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+{% endblock %}

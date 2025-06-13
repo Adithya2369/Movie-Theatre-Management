@@ -1,0 +1,42 @@
+{% extends "staff/base.html" %}
+{% block content %}
+    <h1>{{ movie[1] }} - Screenings</h1>
+    <a href="/staff">← Back to Dashboard</a>
+
+    {% for show in show_bookings %}
+    <div class="card">
+        <div class="screening-header" onclick="toggleBookings({{ show.show_info[0] }})">
+            <h3 class="toggle-btn">
+                {{ show.show_info[2].strftime('%d %b %Y') }} - Slot {{ show.show_info[4] }}
+                ({{ show.show_info[2].strftime('%H:%M') }} to {{ show.show_info[3].strftime('%H:%M') }})
+            </h3>
+            <p>Screen: {{ show.show_info[1] }} | Bookings: {{ show.show_info[5] }}</p>
+        </div>
+        
+        <div id="bookings-{{ show.show_info[0] }}" style="display: none;">
+            {% if show.bookings %}
+            <table>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>User Email</th>
+                    <th>Seats</th>
+                    <th>Amount</th>
+                    <th>Time</th>
+                </tr>
+                {% for booking in show.bookings %}
+                <tr>
+                    <td>{{ booking[0] }}</td>
+                    <td>{{ booking[1] }}</td>
+                    <td>{{ booking[2]|join(', ') }}</td>
+                    <td>₹{{ booking[3] }}</td>
+                    <td>{{ booking[4].strftime('%H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+            <p>No bookings for this screening</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}

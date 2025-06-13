@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manage Shows</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-container { max-width: 800px; margin: 0 auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #333; color: white; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        .alert { padding: 10px; margin-bottom: 15px; border-radius: 4px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Manage Shows</h1>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <h2>Add New Show</h2>
+        <form method="POST">
+            <select name="movie_id" required>
+                <option value="">Select Movie</option>
+                {% for movie in movies %}
+                <option value="{{ movie[0] }}">{{ movie[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="auditorium_id" required>
+                <option value="">Select Auditorium</option>
+                {% for auditorium in auditoriums %}
+                <option value="{{ auditorium[0] }}">{{ auditorium[1] }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="datetime-local" name="start_time" required>
+            <input type="datetime-local" name="end_time" required>
+            <input type="number" name="base_price" step="0.01" min="0" required>
+            
+            <button type="submit">Add Show</button>
+        </form>
+
+        <h2>Existing Shows</h2>
+        <table>
+            <tr>
+                <th>Movie</th>
+                <th>Auditorium</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Base Price</th>
+            </tr>
+            {% for show in shows %}
+            <tr>
+                <td>{{ show[1] }}</td>
+                <td>{{ show[2] }}</td>
+                <td>{{ show[3].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ show[4].strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>₹{{ show[5] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Staff - Movies</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 30px; }
+        .movie-card { background: #f5f5f5; padding: 15px; margin-bottom: 10px; border-radius: 6px; }
+        .movie-card a { color: #007bff; text-decoration: none; }
+        .movie-card a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h2>All Movies (Read Only)</h2>
+    {% for movie in movies %}
+    <div class="movie-card">
+        <h3>{{ movie[1] }}</h3>
+        <a href="{{ url_for('staff_movie_detail', movie_id=movie[0]) }}">View Slots & Bookings</a>
+    </div>
+    {% endfor %}
+</body>
+</html>

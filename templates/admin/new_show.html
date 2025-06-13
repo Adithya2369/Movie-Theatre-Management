@@ -1,0 +1,27 @@
+{% extends "admin/base.html" %}
+{% block content %}
+    <h1>Schedule New Show</h1>
+    <form method="POST">
+        <select name="movie_id" required>
+            <option value="">Select Movie</option>
+            {% for movie in movies %}
+            <option value="{{ movie[0] }}">{{ movie[1] }}</option>
+            {% endfor %}
+        </select>
+        <select name="auditorium_id" required>
+            <option value="">Select Screen</option>
+            {% for auditorium in auditoriums %}
+            <option value="{{ auditorium[0] }}">{{ auditorium[1] }}</option>
+            {% endfor %}
+        </select>
+        <input type="date" name="date" required>
+        <select name="slot" required>
+            <option value="">Select Time Slot</option>
+            {% for slot in slots %}
+            <option value="{{ slot }}">Slot {{ slot }}</option>
+            {% endfor %}
+        </select>
+        <input type="number" name="base_price" step="0.01" min="0" required>
+        <button type="submit">Schedule Show</button>
+    </form>
+{% endblock %}
