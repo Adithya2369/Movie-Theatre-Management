@@ -1,0 +1,11 @@
+{% extends "admin/base.html" %}
+{% block content %}
+    <h1>Manage Screens</h1>
+    <h2>Create New Screen</h2>
+    <form method="POST">
+        <input type="text" name="name" placeholder="Screen Name" required>
+        <input type="number" name="rows" placeholder="Number of Rows" min="1" required>
+        <input type="number" name="seats_per_row" placeholder="Seats per Row" min="1" required>
+        <button type="submit">Create Screen</button>
+    </form>
+{% endblock %}

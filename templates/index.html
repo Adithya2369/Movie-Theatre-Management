@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Movie Theatre - Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .nav {
+            background: #333;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+        .nav a {
+            color: white;
+            margin-right: 20px;
+            text-decoration: none;
+        }
+        .movie-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .movie-card h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">Home</a>
+        {% if 'user_id' in session %}
+            <a href="/logout">Logout</a>
+            {% if session['user_role'] == 'admin' %}
+                <a href="/admin/movies">Admin</a>
+            {% endif %}
+        {% else %}
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        {% endif %}
+    </div>
+
+    <h2>Now Showing</h2>
+    
+    {% for movie in movies %}
+    <div class="movie-card">
+        <h3>{{ movie[1] }}</h3>
+        <p>Genre: {{ movie[3] }} | Language: {{ movie[4] }}</p>
+        <a href="/shows/{{ movie[0] }}">View Showtimes</a>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.querySelectorAll('.movie-card').forEach(card => {
+            card.addEventListener('mouseover', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseout', () => {
+                card.style.transform = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Showtimes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .show-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .show-table th, .show-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        .show-table th {
+            background-color: #333;
+            color: white;
+        }
+        .book-btn {
+            background: #28a745;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="/">← Back to Movies</a>
+    </div>
+
+    <h2>Showtimes for {{ movie[1] }}</h2>
+    
+    <table class="show-table">
+        <tr>
+            <th>Auditorium</th>
+            <th>Start Time</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+        {% for show in shows %}
+        <tr>
+            <td>{{ show.auditorium }}</td>
+            <td>{{ show.start_time.strftime('%d %b %Y %I:%M %p') }}</td>
+            <td>₹{{ show.price }}</td>
+            <td>
+                <a href="/book/{{ show.id }}">
+                    <button class="book-btn">Book Now</button>
+                </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

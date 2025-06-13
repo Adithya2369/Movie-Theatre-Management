@@ -1,0 +1,39 @@
+{% extends "admin/base.html" %}
+{% block content %}
+    <h1>Manage Movies</h1>
+    <h2>Add New Movie</h2>
+    <form method="POST">
+        <input type="text" name="title" placeholder="Title" required>
+        <input type="number" name="duration" placeholder="Duration (mins)" required>
+        <input type="text" name="genre" placeholder="Genre">
+        <input type="text" name="language" placeholder="Language">
+        <input type="date" name="release_date" required>
+        <button type="submit">Add Movie</button>
+    </form>
+    <h2>Existing Movies</h2>
+    <table border="1">
+        <tr>
+            <th>Title</th>
+            <th>Duration</th>
+            <th>Genre</th>
+            <th>Language</th>
+            <th>Release Date</th>
+            <th>Action</th>
+        </tr>
+        {% for movie in movies %}
+        <tr>
+            <td>{{ movie[1] }}</td>
+            <td>{{ movie[2] }} mins</td>
+            <td>{{ movie[3] }}</td>
+            <td>{{ movie[4] }}</td>
+            <td>{{ movie[5] }}</td>
+            <td>
+                <form method="POST">
+                    <input type="hidden" name="delete_id" value="{{ movie[0] }}">
+                    <button type="submit" style="color: red;">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
