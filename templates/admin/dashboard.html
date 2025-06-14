@@ -1,6 +1,7 @@
 {% extends "admin/base.html" %}
 {% block content %}
     <h1>Admin Dashboard</h1>
+    
     <div class="stats">
         <h2>Movie Statistics</h2>
         <table border="1">
@@ -18,6 +19,7 @@
             {% endfor %}
         </table>
     </div>
+
     <div class="recent-bookings">
         <h2>Recent Bookings</h2>
         <table border="1">
@@ -28,7 +30,7 @@
                 <th>Amount</th>
                 <th>Time</th>
             </tr>
-            {% for booking in bookings %}
+            {% for booking in recent_bookings %}
             <tr>
                 <td>{{ booking[0] }}</td>
                 <td>{{ booking[1] }}</td>

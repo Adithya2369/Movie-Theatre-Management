@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import psycopg2
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
+from datetime import datetime, timedelta  # Add timedelta to imports
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
@@ -260,44 +262,83 @@ def calculate_slots(date):
 
 @app.route('/admin')
 def admin_dashboard():
-    if not validate_admin(): return redirect(url_for('login'))
+    if not validate_admin():
+        return redirect(url_for('login'))
+    
     conn = get_db_connection()
     cur = conn.cursor()
+    
+    # Get movie statistics
     cur.execute('''
-        SELECT m.movie_id, m.title, COUNT(b.booking_id), SUM(b.total_price)
+        SELECT m.movie_id, m.title, 
+               COUNT(b.booking_id) AS bookings,
+               COALESCE(SUM(b.total_price), 0) AS revenue
         FROM movies m
         LEFT JOIN shows s ON m.movie_id = s.movie_id
         LEFT JOIN bookings b ON s.show_id = b.show_id
         GROUP BY m.movie_id
     ''')
     stats = cur.fetchall()
+    
+    # Get recent bookings
+    cur.execute('''
+        SELECT b.booking_id, m.title, a.name, b.total_price, b.booking_time 
+        FROM bookings b
+        JOIN shows s ON b.show_id = s.show_id
+        JOIN movies m ON s.movie_id = m.movie_id
+        JOIN auditoriums a ON s.auditorium_id = a.auditorium_id
+        ORDER BY b.booking_time DESC LIMIT 10
+    ''')
+    recent_bookings = cur.fetchall()
+    
     cur.close()
     conn.close()
-    return render_template('admin/dashboard.html', stats=stats)
+    
+    return render_template('admin/dashboard.html', 
+                         stats=stats,
+                         recent_bookings=recent_bookings)
 
 @app.route('/admin/movies', methods=['GET', 'POST'])
 def admin_movies():
-    if not validate_admin(): return redirect(url_for('login'))
+    if not validate_admin():
+        return redirect(url_for('login'))
+    
     conn = get_db_connection()
     cur = conn.cursor()
+    
     if request.method == 'POST':
-        if 'delete' in request.form:
-            cur.execute('DELETE FROM movies WHERE movie_id = %s', (request.form['movie_id'],))
-            conn.commit()
-            flash('Movie deleted.', 'success')
+        # Handle delete action
+        if 'delete_id' in request.form:
+            movie_id = request.form['delete_id']
+            try:
+                cur.execute('DELETE FROM movies WHERE movie_id = %s', (movie_id,))
+                conn.commit()
+                flash('Movie deleted successfully', 'success')
+            except Exception as e:
+                conn.rollback()
+                flash(f'Error deleting movie: {str(e)}', 'danger')
+        # Handle add action        
         else:
-            cur.execute('''
-                INSERT INTO movies (title, duration, genre, language, release_date)
-                VALUES (%s, %s, %s, %s, %s)
-            ''', (request.form['title'], request.form['duration'], 
-                 request.form['genre'], request.form['language'], 
-                 request.form['release_date']))
-            conn.commit()
-            flash('Movie added.', 'success')
+            try:
+                cur.execute('''
+                    INSERT INTO movies (title, duration, genre, language, release_date)
+                    VALUES (%s, %s, %s, %s, %s)
+                ''', (request.form['title'],
+                     request.form['duration'],
+                     request.form['genre'],
+                     request.form['language'],
+                     request.form['release_date']))
+                conn.commit()
+                flash('Movie added successfully', 'success')
+            except Exception as e:
+                conn.rollback()
+                flash(f'Error adding movie: {str(e)}', 'danger')
+    
     cur.execute('SELECT * FROM movies ORDER BY release_date DESC')
     movies = cur.fetchall()
     cur.close()
     conn.close()
+    
     return render_template('admin/movies.html', movies=movies)
 
 @app.route('/admin/movies/<int:movie_id>')
@@ -390,6 +431,48 @@ def admin_add_show():
     cur.close()
     conn.close()
     return render_template('admin/new_show.html', movies=movies, auditoriums=auditoriums, slots=range(1,7))
+
+@app.route('/admin/shows')
+def admin_shows():
+    if not validate_admin():
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    cur.execute('''
+        SELECT s.show_id, m.title, a.name, 
+               s.start_time, s.end_time, s.base_price
+        FROM shows s
+        JOIN movies m ON s.movie_id = m.movie_id
+        JOIN auditoriums a ON s.auditorium_id = a.auditorium_id
+        ORDER BY s.start_time DESC
+    ''')
+    shows = cur.fetchall()
+    
+    cur.close()
+    conn.close()
+    return render_template('admin/shows.html', shows=shows)
+
+@app.route('/admin/shows/delete/<int:show_id>', methods=['POST'])
+def admin_delete_show(show_id):
+    if not validate_admin():
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute('DELETE FROM shows WHERE show_id = %s', (show_id,))
+        conn.commit()
+        flash('Show deleted successfully', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error deleting show: {str(e)}', 'danger')
+    finally:
+        cur.close()
+        conn.close()
+    return redirect(url_for('admin_shows'))
+
 # ========================
 #      Staff Routes
 # ========================
