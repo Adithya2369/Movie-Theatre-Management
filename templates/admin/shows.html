@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
     <title>Manage Shows</title>
@@ -70,4 +70,59 @@
         </table>
     </div>
 </body>
-</html>
+</html> -->
+
+{% extends "admin/base.html" %}
+{% block content %}
+    <h1>Manage Shows</h1>
+    <a href="/admin/shows/new" class="btn">Add New Show</a>
+
+    <table>
+        <tr>
+            <th>Movie</th>
+            <th>Screen</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Base Price</th>
+            <th>Action</th>
+        </tr>
+        {% for show in shows %}
+        <tr>
+            <td>{{ show[1] }}</td>
+            <td>{{ show[2] }}</td>
+            <td>{{ show[3].strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>{{ show[4].strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>₹{{ show[5] }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('admin_delete_show', show_id=show[0]) }}">
+                    <button type="submit" 
+                            onclick="return confirm('Delete this show?')"
+                            class="delete-btn">
+                        Delete
+                    </button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <style>
+        .btn {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
